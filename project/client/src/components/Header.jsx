@@ -1,14 +1,15 @@
 import { useClerk, useUser, UserButton } from "@clerk/clerk-react";
+import axios from "axios";
 import React, { useState, useEffect } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { ClipboardList } from "lucide-react"; // 👉 icon đẹp
 
 export default function Header() {
   const navLinks = [
     { title: "TRANG CHỦ", href: "/" },
-    { title: "DỊCH VỤ DỌN NHÀ", href: "/dich-vu-don-nha" },
+    { title: "DỊCH VỤ DỌN NHÀ", href: "/service" },
     { title: "GIỚI THIỆU", href: "/about" },
     { title: "LIÊN HỆ", href: "/contact" },
-    { title: "KHUYẾN MÃI", href: "/khuyen-mai" },
   ];
 
   const [isScrolled, setIsScrolled] = useState(false);
@@ -17,11 +18,33 @@ export default function Header() {
   const { user } = useUser();
   const navigate = useNavigate();
 
+  // hiệu ứng shadow khi scroll
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 5);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Đồng bộ customer với backend
+  useEffect(() => {
+    const syncCustomer = async () => {
+      if (user) {
+        try {
+          await axios.post("http://localhost:5000/api/auth/sync", {
+            clerkId: user.id,
+            name: user.fullName,
+            email: user.primaryEmailAddress?.emailAddress,
+            phone: user.primaryPhoneNumber?.phoneNumber,
+            address: "",
+          });
+          console.log("✅ Customer synced");
+        } catch (err) {
+          console.error("❌ Lỗi sync customer:", err);
+        }
+      }
+    };
+    syncCustomer();
+  }, [user]);
 
   return (
     <header
@@ -32,11 +55,7 @@ export default function Header() {
       <div className="container mx-auto flex items-center justify-between px-4 py-3 md:py-4">
         {/* Logo */}
         <Link to="/" className="flex items-center">
-          <img
-            src="https://www.btaskee.com/wp-content/uploads/2020/11/logo_btaskee_ver_3.png"
-            alt="Btaskee"
-            className="h-10 md:h-12"
-          />
+          <h1 className="text-teal-600 font-bold text-4xl">HomeCare</h1>
         </Link>
 
         {/* Desktop Menu */}
@@ -52,15 +71,18 @@ export default function Header() {
           ))}
         </nav>
 
-        {/* Desktop User + Cart */}
+        {/* Desktop User */}
         <div className="hidden md:flex items-center gap-4">
           {user ? (
-            <UserButton>
+            <UserButton afterSignOutUrl="/">
               <UserButton.MenuItems>
+                <UserButton.Action label="manageAccount" />
                 <UserButton.Action
-                  label="Lịch sử đặt dịch vụ"
-                  onClick={() => navigate("/lich-su-dat-hang")}
+                  label="Lịch sử đặt hàng"
+                  labelIcon={<ClipboardList className="w-4 h-4" />}
+                  onClick={() => navigate("/orders")}
                 />
+                <UserButton.Action label="signOut" />
               </UserButton.MenuItems>
             </UserButton>
           ) : (
@@ -71,21 +93,6 @@ export default function Header() {
               Đăng nhập
             </button>
           )}
-
-          <button className="relative">
-            <svg
-              className="w-6 h-6 text-gray-800"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-            >
-              <path d="M3 3h2l.4 2M7 13h14l-1.5 8H6l-1.5-8z" />
-            </svg>
-            <span className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full text-xs w-4 h-4 flex items-center justify-center">
-              3
-            </span>
-          </button>
         </div>
 
         {/* Mobile Menu Button */}
@@ -135,7 +142,22 @@ export default function Header() {
         ))}
 
         {user ? (
-          <UserButton />
+          <div className="mt-6">
+            <UserButton afterSignOutUrl="/">
+              <UserButton.MenuItems>
+                <UserButton.Action label="manageAccount" />
+                <UserButton.Action
+                  label="Lịch sử đặt hàng"
+                  labelIcon={<ClipboardList className="w-4 h-4" />}
+                  onClick={() => {
+                    navigate("/lich-su-dat-hang");
+                    setIsMenuOpen(false);
+                  }}
+                />
+                <UserButton.Action label="signOut" />
+              </UserButton.MenuItems>
+            </UserButton>
+          </div>
         ) : (
           <button
             onClick={openSignIn}
@@ -144,21 +166,6 @@ export default function Header() {
             Đăng nhập
           </button>
         )}
-
-        <button className="relative mt-4">
-          <svg
-            className="w-6 h-6 text-gray-800"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            viewBox="0 0 24 24"
-          >
-            <path d="M3 3h2l.4 2M7 13h14l-1.5 8H6l-1.5-8z" />
-          </svg>
-          <span className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full text-xs w-4 h-4 flex items-center justify-center">
-            3
-          </span>
-        </button>
       </div>
       <hr />
     </header>

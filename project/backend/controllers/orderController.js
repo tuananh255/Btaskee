@@ -1,17 +1,26 @@
+const CustomerModel = require("../models/CustomerModel");
 const Order = require("../models/OrderModel");
 
 // Tạo đơn hàng mới
 const createOrder = async (req, res) => {
   try {
-    const { customer, service, branch, scheduledAt, notes, price } = req.body;
+    const { customer, service, branch, scheduledAt, notes, price,paymentMethod ,paymentStatus } = req.body;
+
+    // 🔑 customer ở đây là clerkId (string)
+    const existingCustomer = await CustomerModel.findOne({ clerkId: customer });
+    if (!existingCustomer) {
+      return res.status(400).json({ error: "Customer not found" });
+    }
 
     const order = new Order({
-      customer,
+      customer: existingCustomer._id, // ✅ dùng ObjectId
       service,
       branch,
       scheduledAt,
       notes,
       price,
+      paymentMethod: paymentMethod || "COD", 
+      paymentStatus:paymentStatus,
       status: "pending",
     });
 
@@ -46,6 +55,7 @@ const getAllOrders = async (req, res) => {
 // Lấy đơn theo ID
 const getOrderById = async (req, res) => {
   try {
+    console.log(req.params.id)
     const order = await Order.findById(req.params.id)
       .populate("customer", "name phone email")
       .populate("staff", "name phone email")
@@ -62,8 +72,14 @@ const getOrderById = async (req, res) => {
 // Lấy đơn theo khách hàng
 const getOrdersByCustomer = async (req, res) => {
   try {
-    const { customerId } = req.params;
-    const orders = await Order.find({ customer: customerId })
+    const { customerId } = req.params; // clerkId
+
+    const customer = await CustomerModel.findOne({ clerkId: customerId });
+    if (!customer) {
+      return res.status(404).json({ error: "Customer not found" });
+    }
+
+    const orders = await Order.find({ customer: customer._id })
       .populate("staff", "name phone email")
       .populate("service", "name price")
       .populate("branch", "name address");
@@ -73,6 +89,7 @@ const getOrdersByCustomer = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
 
 // ✅ Update đơn hàng chung
 const updateOrder = async (req, res) => {

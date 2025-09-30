@@ -7,11 +7,7 @@ export default function Footer() {
 
         {/* Logo + Giới thiệu */}
         <div className="flex flex-col gap-4">
-          <img
-            src="https://www.btaskee.com/wp-content/uploads/2020/11/logo_btaskee_ver_3.png"
-            alt="Btaskee"
-            className=""
-          />
+          <h1 className="text-teal-600 font-bold text-3xl">HomeCare</h1>
           <p className="text-gray-600 text-sm">
             Btaskee – Dịch vụ dọn nhà, dọn văn phòng và vệ sinh chuyên nghiệp, tiện lợi tại nhà.
           </p>

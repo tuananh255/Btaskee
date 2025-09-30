@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Meta from "../components/Meta";
 
 export default function Contact() {
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
@@ -15,8 +16,9 @@ export default function Contact() {
 
   return (
     <div className="min-h-screen bg-white text-gray-800">
+      <Meta title={"Liên hệ"} />
       {/* Banner */}
-      <div className="bg-[#ff8228] text-white py-20 flex flex-col items-center justify-center">
+      <div className="bg-gradient-to-r from-teal-600 to-green-500 text-white py-20 flex flex-col items-center justify-center">
         <h1 className="text-4xl md:text-5xl font-bold mb-4">Liên hệ với chúng tôi</h1>
         <p className="text-lg md:text-xl max-w-2xl text-center">
           Nếu bạn có câu hỏi hoặc cần hỗ trợ, vui lòng gửi thông tin cho chúng tôi.
@@ -26,7 +28,7 @@ export default function Contact() {
       <div className="container mx-auto px-4 py-16 grid grid-cols-1 md:grid-cols-2 gap-12">
         {/* Form liên hệ */}
         <div>
-          <h2 className="text-2xl font-semibold mb-6 text-[#ff8228]">Gửi tin nhắn</h2>
+          <h2 className="text-2xl font-semibold mb-6 text-teal-600">Gửi tin nhắn</h2>
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <input
               type="text"
@@ -57,7 +59,7 @@ export default function Contact() {
             />
             <button
               type="submit"
-              className="bg-[#ff8228] text-white px-6 py-3 rounded-lg font-medium hover:bg-orange-600 transition-all"
+              className="bg-teal-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-orange-600 transition-all"
             >
               Gửi liên hệ
             </button>
@@ -67,7 +69,7 @@ export default function Contact() {
         {/* Thông tin liên hệ + Map */}
         <div className="flex flex-col gap-6">
           <div>
-            <h2 className="text-2xl font-semibold mb-4 text-[#ff8228]">Thông tin liên hệ</h2>
+            <h2 className="text-2xl font-semibold mb-4 text-teal-600">Thông tin liên hệ</h2>
             <p className="text-gray-600 text-sm mb-2">Hotline: 1800 1234</p>
             <p className="text-gray-600 text-sm mb-2">Email: support@btaskee.com</p>
             <p className="text-gray-600 text-sm mb-2">Địa chỉ: 123 Đường ABC, TP.HCM</p>

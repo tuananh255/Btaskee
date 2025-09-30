@@ -34,6 +34,12 @@ import StaffWorkPage from './pages/staff/StaffWorkPage'
 import StaffSchedulePage from './pages/staff/StaffSchedulePage'
 import FeedbackPage from './pages/staff/FeedbackPage'
 import AssignShiftsPage from './pages/admin/AssignShiftsPage'
+import Service from './pages/customer/Service'
+import Booking from './pages/customer/Booking'
+import BookingSuccess from './pages/customer/BookingSuccess'
+import OrderHistory from './pages/customer/OrderHistory'
+import OrderDetailUser from './pages/customer/OrderDetailUser'
+import ServiceDetail from './pages/customer/ServiceDetail'
 
 function App() {
    const { user } = useUser();
@@ -46,6 +52,12 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/booking/:id" element={<Booking />} />
+          <Route path="/service" element={<Service />} />
+          <Route path="/service/:id" element={<ServiceDetail />} />
+          <Route path="/orders-susscess" element={<BookingSuccess />} />
+          <Route path="/orders/:id" element={<OrderDetailUser />} />
+          <Route path="/orders" element={<OrderHistory customerId={user?.id} />} />
           <Route path="*" element={<NotFound />} />
         </Route>
      

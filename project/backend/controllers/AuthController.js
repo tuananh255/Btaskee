@@ -28,14 +28,12 @@ const createEmployee = async (req, res) => {
       }
     }
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
+    // KHÔNG hash ở đây nữa, để schema tự hash
     const newUser = new User({
       name,
       email,
       phone,
-      password: hashedPassword,
+      password,
       role,
       branch: branch ? branch._id : null,
     });
@@ -65,7 +63,9 @@ const loginEmployee = async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ message: "Vui lòng nhập email và mật khẩu!" });
+      return res
+        .status(400)
+        .json({ message: "Vui lòng nhập email và mật khẩu!" });
     }
 
     const user = await User.findOne({ email });
@@ -73,7 +73,8 @@ const loginEmployee = async (req, res) => {
       return res.status(400).json({ message: "Nhân viên không tồn tại!" });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    // Dùng method từ schema
+    const isMatch = await user.comparePassword(password);
     if (!isMatch) {
       return res.status(400).json({ message: "Mật khẩu không chính xác!" });
     }

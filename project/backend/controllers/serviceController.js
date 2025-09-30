@@ -67,8 +67,48 @@ const deleteService = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+const getReviewsForService = async (req, res) => {
+  try {
+    const { serviceId } = req.params;
+    const service = await Service.findById(serviceId).select("reviews averageRating reviewCount");
+    if (!service) return res.status(404).json({ message: "Service not found" });
 
+    // trả mảng reviews (sorted theo createdAt desc)
+    const reviews = (service.reviews || []).slice().sort((a, b) => b.createdAt - a.createdAt);
+    res.json({ reviews, averageRating: service.averageRating, reviewCount: service.reviewCount });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// Thêm review mới vào service
+const addReviewToService = async (req, res) => {
+  try {
+    const { serviceId } = req.params;
+    const { name, rating, comment } = req.body;
+
+    const service = await Service.findById(serviceId);
+    if (!service) {
+      return res.status(404).json({ message: "Service not found" });
+    }
+
+    const newReview = {
+      name,
+      rating: Number(rating),
+      comment,
+      createdAt: new Date(),
+    };
+
+    service.reviews.push(newReview);
+    await service.save();
+
+    // Quan trọng: trả về object review và status code 201
+    res.status(201).json(newReview);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
 module.exports = {
-  deleteService,updateService,createService,getServiceById,getAllServices
+  deleteService,updateService,createService,getServiceById,getAllServices,addReviewToService,getReviewsForService
 }

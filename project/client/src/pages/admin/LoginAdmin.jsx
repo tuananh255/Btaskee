@@ -121,7 +121,7 @@ export default function LoginService() {
             </button>
           </form>
 
-          <p className="mt-6 text-gray-500 text-sm text-center">
+          <p className=" mt-6 text-gray-500 text-sm text-center">
             Dịch vụ dọn nhà chuyên nghiệp - sạch sẽ và nhanh chóng
           </p>
         </div>

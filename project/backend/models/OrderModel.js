@@ -16,7 +16,7 @@ const orderSchema = new Schema(
     completedAt: { type: Date },
     price: { type: Number },
     notes: { type: String },
-    paymentMethod: { type: String, enum: ["COD", "Online"], default: "COD" },
+    paymentMethod: { type: String, enum: ["COD", "Thanh toán Momo"], default: "COD" },
     paymentStatus: { type: String, enum: ["unpaid", "paid"], default: "unpaid" },
   },
   { timestamps: true }

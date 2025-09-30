@@ -13,6 +13,7 @@ const customerRoute = require("./routers/customerRoute");
 const workAssignmentRoutes = require("./routers/workAssignmentRoutes");
 const employeeRoutes = require("./routers/employeeRoute");
 const orderRoutes = require("./routers/orderRoutes");
+const momoRoutes = require("./routers/momoRoutes");
 dbConnect()
 app.use(cors({
   origin: "http://localhost:5173",
@@ -34,6 +35,7 @@ app.use("/api/customers", customerRoute);
 app.use("/api/work-assignments", workAssignmentRoutes);
 app.use("/api/branches", branchRoutes);
 app.use("/api/employees", employeeRoutes);
+app.use("/api/momo", momoRoutes);
 app.use("/api/orders", orderRoutes);
 
 app.listen(PORT, () => {
