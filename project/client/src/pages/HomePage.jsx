@@ -1,243 +1,261 @@
 import React, { useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay, Pagination } from "swiper/modules";
+import { Autoplay, Pagination, EffectFade } from "swiper/modules";
+import { motion } from "framer-motion";
 import "swiper/css";
 import "swiper/css/pagination";
+import "swiper/css/effect-fade";
 import { Link } from "react-router-dom";
 import Meta from "../components/Meta";
-
-const heroImages = [
-  "https://www.btaskee.com/wp-content/uploads/2021/01/tai-sao-chon-upholstery-cleaning-ver3.png",
-  "https://www.btaskee.com/wp-content/uploads/2020/11/home-page-an-tam-voi-lua-chon-cua-ban.png",
-  "https://www.btaskee.com/wp-content/uploads/2023/08/office-cleaning-addon-glasses.jpeg",
-  "https://www.btaskee.com/wp-content/uploads/2023/08/office-cleaning-addon-vacuuming.jpeg",
-  "https://www.btaskee.com/wp-content/uploads/2023/08/office-cleaning-compare-team.jpeg",
-];
-
-const features = [
-  {
-    title: "Đặt lịch nhanh chóng",
-    desc: "Chỉ 60 giây thao tác trên ứng dụng, có ngay người nhận việc.",
-    img: "https://www.btaskee.com/wp-content/uploads/2020/11/chon-dich-vu-deep-cleaning.png",
-  },
-  {
-    title: "Giá cả rõ ràng",
-    desc: "Giá dịch vụ minh bạch, không phí phát sinh.",
-    img: "https://www.btaskee.com/wp-content/uploads/2020/10/cong-tac-vien-.jpg",
-  },
-  {
-    title: "Đa dạng dịch vụ",
-    desc: "Với hơn 9 dịch vụ tiện ích, đáp ứng mọi nhu cầu việc nhà.",
-    img: "https://www.btaskee.com/wp-content/uploads/2020/11/chon-dich-vu-deep-cleaning.png",
-  },
-  {
-    title: "An toàn tối đa",
-    desc: "Người làm uy tín, hồ sơ rõ ràng, được công ty giám sát.",
-    img: "https://www.btaskee.com/wp-content/uploads/2020/11/chon-dich-vu-ac-cleaning.png",
-  },
-  {
-    title: "Hỗ trợ 24/7",
-    desc: "Đội ngũ luôn sẵn sàng giải đáp mọi thắc mắc của bạn.",
-    img: "https://www.btaskee.com/wp-content/uploads/2020/11/chon-dich-vu-laundry.png",
-  },
-  {
-    title: "Ưu đãi hấp dẫn",
-    desc: "Chương trình giảm giá đặc biệt cho khách hàng mới và thân thiết.",
-    img: "https://www.btaskee.com/wp-content/uploads/2020/11/chon-dich-vu-home-cooking.png",
-  },
-  {
-    title: "Dịch vụ chuyên nghiệp",
-    desc: "Nhân viên được đào tạo, uy tín và thân thiện.",
-    img: "https://www.btaskee.com/wp-content/uploads/2020/11/chon-dich-vu-ac-housekeeping.png",
-  },
-  {
-    title: "Theo dõi đơn giản",
-    desc: "Quản lý lịch hẹn và trạng thái công việc dễ dàng.",
-    img: "https://www.btaskee.com/wp-content/uploads/2020/11/chon-dich-vu-disinfection.png",
-  },
-];
-
-const howItWorks = [
-  { step: 1, title: "Chọn dịch vụ", desc: "Chọn dịch vụ phù hợp với nhu cầu của bạn." },
-  { step: 2, title: "Đặt lịch nhanh chóng", desc: "Chỉ cần vài giây trên app là có lịch hẹn." },
-  { step: 3, title: "Theo dõi & đánh giá", desc: "Theo dõi tiến trình và đánh giá sau khi hoàn thành." },
-];
-
-const services = [
-  { title: "Dọn nhà", img: "https://www.btaskee.com/wp-content/uploads/2020/11/chon-dich-vu-deep-cleaning.png" },
-  { title: "Giặt ủi", img: "https://www.btaskee.com/wp-content/uploads/2020/11/chon-dich-vu-ac-housekeeping.png" },
-  { title: "Rửa xe", img: "https://www.btaskee.com/wp-content/uploads/2023/08/office-cleaning-compare-task.jpeg" },
-  { title: "Chăm sóc cây", img: "http://www.btaskee.com/wp-content/uploads/2023/08/office-cleaning-area-lobby.jpeg" },
-  { title: "Nấu ăn", img: "http://www.btaskee.com/wp-content/uploads/2023/08/office-cleaning-area-toilet.jpeg" },
-  { title: "Vệ sinh văn phòng", img: "http://www.btaskee.com/wp-content/uploads/2023/08/office-cleaning-area-elevator.jpeg" },
-];
-
-const testimonials = [
-  { name: "Nguyễn Văn A", text: "Dịch vụ nhanh chóng, nhân viên nhiệt tình.", avatar: "https://randomuser.me/api/portraits/men/32.jpg" },
-  { name: "Trần Thị B", text: "Mọi thứ minh bạch và uy tín.", avatar: "https://randomuser.me/api/portraits/women/44.jpg" },
-  { name: "Lê Văn C", text: "Rất hài lòng với dịch vụ!", avatar: "https://randomuser.me/api/portraits/men/56.jpg" },
-  { name: "Phạm Thị D", text: "Sẽ tiếp tục sử dụng lâu dài.", avatar: "https://randomuser.me/api/portraits/women/66.jpg" },
-];
-
-const faqs = [
-  { q: "Ứng dụng triển khai ở đâu?", a: "Hiện tại hơn 20 tỉnh thành và 3 quốc gia Đông Nam Á." },
-  { q: "Chất lượng dịch vụ đảm bảo không?", a: "CTV có kinh nghiệm, được kiểm tra trước khi nhận việc." },
-  { q: "Đăng việc mất bao lâu?", a: "Trong vòng 1 giờ sẽ có người nhận, trừ lễ/giờ cao điểm." },
-  { q: "Có làm việc ngày Lễ/Tết không?", a: "Hoạt động xuyên suốt, nên đặt trước 1-2 ngày." },
-];
+import { heroImages, features, howItWorks, services, testimonials, faqs } from "../data/index";
 
 export default function HomePage() {
   const [openIndex, setOpenIndex] = useState(null);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Hero Slider */}
+    <div className="relative min-h-screen bg-gradient-to-br from-orange-50 via-white to-teal-50 overflow-hidden">
       <Meta title={"Trang chủ"} />
-      <div className="relative w-full h-[700px] md:h-[750px] lg:h-[800px]">
+
+      {/* 🌈 Animated Gradient Background */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-orange-100 via-white to-teal-50 animate-gradient-x"></div>
+
+      {/* ✨ Floating Light Blobs */}
+      <div className="absolute top-10 left-10 w-64 h-64 bg-orange-400/20 rounded-full blur-3xl animate-float-slow"></div>
+      <div className="absolute bottom-20 right-20 w-80 h-80 bg-teal-400/20 rounded-full blur-3xl animate-float"></div>
+
+      {/* 🏠 HERO SECTION */}
+      <section className="relative w-full h-[90vh] overflow-hidden">
         <Swiper
-          modules={[Autoplay, Pagination]}
-          autoplay={{ delay: 3500 }}
+          modules={[Autoplay, Pagination, EffectFade]}
+          autoplay={{ delay: 4500 }}
+          effect="fade"
           loop
           pagination={{ clickable: true }}
+          className="h-full"
         >
           {heroImages.map((img, i) => (
             <SwiperSlide key={i}>
               <div className="relative w-full h-full">
-                <img
-                  src={img}
-                  alt={`slide-${i}`}
-                  className="w-full h-[600px] object-cover object-center"
-                  loading="lazy"
-                />
-                <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/10 flex flex-col items-center justify-center text-center text-white px-6">
-                  <h1 className="text-3xl md:text-5xl font-bold drop-shadow-lg">
-                    Giải pháp việc nhà tiện lợi
-                  </h1>
-                  <p className="mt-4 text-lg md:text-xl max-w-2xl drop-shadow">
-                    Nhanh chóng, minh bạch và an toàn
-                  </p>
-                  <button className="mt-6 px-8 py-3 bg-[#ff8228] text-white rounded-full shadow hover:bg-orange-600 transition transform hover:scale-105">
-                    <Link to='/service'> Đặt dịch vụ ngay</Link>
-                  </button>
+                {/* Parallax background */}
+                <div className="absolute inset-0 overflow-hidden">
+                  <motion.img
+                    src={img}
+                    alt=""
+                    className="w-full h-full object-cover object-center scale-110"
+                    animate={{ scale: [1.1, 1.2, 1.1] }}
+                    transition={{ repeat: Infinity, duration: 10, ease: "easeInOut" }}
+                  />
+                </div>
+                {/* Overlay + content */}
+                <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-transparent flex flex-col items-center justify-center text-white text-center">
+                  <motion.h1
+                    initial={{ opacity: 0, y: 50 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 1 }}
+                    className="text-6xl md:text-7xl font-extrabold tracking-tight drop-shadow-2xl"
+                  >
+                    Giải pháp giúp việc chuyên nghiệp
+                  </motion.h1>
+                  <motion.p
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 1.2, delay: 0.2 }}
+                    className="mt-6 text-lg md:text-2xl text-gray-200 max-w-2xl leading-relaxed"
+                  >
+                    Nhanh chóng • An toàn • Minh bạch
+                  </motion.p>
+                  <motion.div
+                    whileHover={{ scale: 1.1 }}
+                    transition={{ type: "spring", stiffness: 250 }}
+                    className="mt-10"
+                  >
+                    <Link
+                      to="/service"
+                      className="px-10 py-3 bg-gradient-to-r from-[#ff8228] via-orange-500 to-red-500 rounded-full shadow-lg hover:shadow-2xl text-white font-semibold tracking-wide transition-all duration-300 animate-pulse-soft"
+                    >
+                      🚀 Đặt dịch vụ ngay
+                    </Link>
+                  </motion.div>
                 </div>
               </div>
             </SwiperSlide>
           ))}
         </Swiper>
-      </div>
+      </section>
 
-      {/* Features Section */}
-      <section className="max-w-6xl mx-auto px-6 py-16 grid sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-8">
+      {/* 💡 FEATURES */}
+      <section className="max-w-7xl mx-auto px-6 py-28 grid sm:grid-cols-2 md:grid-cols-4 gap-10 relative z-10">
         {features.map((f, i) => (
-          <div
+          <motion.div
             key={i}
-            className="flex flex-col items-center bg-white p-6 rounded-2xl shadow hover:shadow-xl transition transform hover:scale-105"
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.1, duration: 0.5 }}
+            whileHover={{ scale: 1.08, rotate: 1 }}
+            className="bg-white/70 backdrop-blur-xl border border-white/40 rounded-3xl shadow-xl hover:shadow-2xl p-8 flex flex-col items-center text-center transition-all duration-300 hover:-translate-y-3"
           >
-            <div className="p-4 bg-teal-50 rounded-full">
-              <img src={f.img} alt={f.title} className="w-12 h-12" />
+            <div className="relative w-20 h-20 mb-5">
+              <img src={f.img} alt={f.title} className="w-full h-full rounded-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-tr from-orange-300/30 to-transparent rounded-full blur-sm"></div>
             </div>
-            <h3 className="mt-4 text-lg font-semibold text-gray-800">{f.title}</h3>
-            <p className="text-gray-600 text-sm mt-2 text-center">{f.desc}</p>
-          </div>
+            <h3 className="text-xl font-bold text-gray-800">{f.title}</h3>
+            <p className="text-gray-600 mt-3 text-sm leading-relaxed">{f.desc}</p>
+          </motion.div>
         ))}
       </section>
 
-      {/* How It Works */}
-      <section className="max-w-6xl mx-auto px-6 py-16">
-        <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-800 mb-12">
-          Quy trình 3 bước
-        </h2>
-        <div className="grid md:grid-cols-3 gap-8">
-          {howItWorks.map((step) => (
-            <div key={step.step} className="bg-white p-6 rounded-2xl shadow hover:shadow-lg transition">
-              <div className="text-4xl font-bold text-teal-600 mb-4">{step.step}</div>
-              <h3 className="text-xl font-semibold mb-2">{step.title}</h3>
-              <p className="text-gray-600">{step.desc}</p>
-            </div>
+      {/* 🧩 HOW IT WORKS */}
+      <section className="bg-gradient-to-b from-white to-orange-50 py-28 text-center relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-full bg-[url('/pattern.svg')] opacity-10"></div>
+        <motion.h2
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7 }}
+          className="text-4xl md:text-5xl font-extrabold text-gray-800 mb-16"
+        >
+          Quy trình 3 bước đơn giản
+        </motion.h2>
+        <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-10 px-6">
+          {howItWorks.map((s, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 60 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.2 }}
+              whileHover={{ scale: 1.05 }}
+              className="relative bg-white/80 border border-orange-100 backdrop-blur-md rounded-3xl shadow-xl p-10 overflow-hidden hover:border-orange-400 transition"
+            >
+              <motion.div
+                animate={{ y: [0, -10, 0] }}
+                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                className="text-7xl font-extrabold text-[#ff8228] mb-5"
+              >
+                {s.step}
+              </motion.div>
+              <h3 className="text-2xl font-semibold text-gray-800 mb-3">{s.title}</h3>
+              <p className="text-gray-600 leading-relaxed">{s.desc}</p>
+            </motion.div>
           ))}
         </div>
       </section>
 
-      {/* Services Gallery */}
-      <section className="max-w-6xl mx-auto px-6 py-16">
-        <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-800 mb-12">
+      {/* 💼 SERVICES */}
+      <section className="relative max-w-7xl mx-auto px-6 py-28">
+        <motion.h2
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          className="text-4xl md:text-5xl font-extrabold text-center text-gray-800 mb-16"
+        >
           Dịch vụ nổi bật
-        </h2>
-        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
+        </motion.h2>
+        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8">
           {services.map((s, i) => (
-            <div key={i} className="relative rounded-2xl overflow-hidden shadow hover:shadow-xl transition transform hover:scale-105 cursor-pointer">
-              <img src={s.img} alt={s.title} className="w-full h-60 object-cover" />
-              <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 hover:opacity-100 transition">
-                <button className="px-6 py-2 bg-orange-500 text-white rounded-full">
-                  <Link to='service'>Đặt ngay</Link>
-                </button>
+            <motion.div
+              key={i}
+              whileHover={{ scale: 1.04 }}
+              className="relative overflow-hidden rounded-3xl shadow-xl group cursor-pointer"
+            >
+              <img
+                src={s.img}
+                alt={s.title}
+                className="w-full h-80 object-cover transition-transform duration-[1500ms] group-hover:scale-110"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent flex flex-col justify-end p-8 text-white">
+                <h3 className="text-2xl font-semibold mb-3">{s.title}</h3>
+                <Link
+                  to="/service"
+                  className="inline-block bg-gradient-to-r from-orange-500 to-orange-600 px-5 py-2 rounded-full text-sm font-medium hover:shadow-lg hover:brightness-110 transition-all"
+                >
+                  Đặt ngay
+                </Link>
               </div>
-              <h3 className="absolute bottom-4 left-4 text-white font-semibold text-lg drop-shadow">{s.title}</h3>
-            </div>
+            </motion.div>
           ))}
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section className="max-w-6xl mx-auto px-6 py-16 bg-gray-100 rounded-2xl">
-        <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-800 mb-12">
+      {/* 💬 TESTIMONIALS */}
+      <section className="bg-gradient-to-br from-teal-50 via-white to-orange-50 py-28">
+        <h2 className="text-4xl md:text-5xl font-bold text-center text-gray-800 mb-14">
           Khách hàng nói gì
         </h2>
-        <div className="grid md:grid-cols-2 gap-8">
+        <Swiper
+          modules={[Autoplay]}
+          autoplay={{ delay: 4500 }}
+          loop
+          slidesPerView={1}
+          breakpoints={{ 768: { slidesPerView: 2 } }}
+          spaceBetween={40}
+          className="max-w-6xl mx-auto px-6"
+        >
           {testimonials.map((t, i) => (
-            <div key={i} className="bg-white p-6 rounded-2xl shadow hover:shadow-lg transition">
-              <div className="flex items-center mb-4">
-                <img src={t.avatar} alt={t.name} className="w-12 h-12 rounded-full mr-4" />
-                <h3 className="font-semibold text-gray-800">{t.name}</h3>
-              </div>
-              <p className="text-gray-600">{t.text}</p>
-            </div>
+            <SwiperSlide key={i}>
+              <motion.div
+                whileHover={{ scale: 1.03 }}
+                className="bg-white/90 rounded-3xl shadow-lg p-8 border border-gray-100 hover:shadow-2xl transition"
+              >
+                <div className="flex items-center mb-4">
+                  <img src={t.avatar} alt={t.name} className="w-14 h-14 rounded-full mr-4" />
+                  <div>
+                    <h3 className="font-semibold text-gray-800">{t.name}</h3>
+                    <p className="text-sm text-gray-500">{t.role}</p>
+                  </div>
+                </div>
+                <p className="text-gray-600 italic leading-relaxed">“{t.text}”</p>
+              </motion.div>
+            </SwiperSlide>
           ))}
-        </div>
+        </Swiper>
       </section>
 
-      {/* FAQ */}
-      <section className="max-w-4xl mx-auto px-6 py-16">
-        <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-800 mb-8">
+      {/* ❓ FAQ */}
+      <section className="max-w-3xl mx-auto px-6 py-28">
+        <h2 className="text-4xl font-extrabold text-center text-gray-800 mb-12">
           Câu hỏi thường gặp
         </h2>
-        <div className="space-y-4">
-          {faqs.map((faq, i) => (
-            <div
-              key={i}
-              className="border rounded-lg p-4 bg-gradient-to-r from-indigo-50 to-white cursor-pointer transition hover:bg-indigo-100"
-              onClick={() => setOpenIndex(openIndex === i ? null : i)}
-            >
-              <div className="flex justify-between items-center">
-                <h3 className="font-medium text-gray-700">{faq.q}</h3>
-                <svg
-                  width="18"
-                  height="18"
-                  className={`transition-transform ${openIndex === i ? "rotate-180" : ""}`}
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M19 9l-7 7-7-7" />
-                </svg>
-              </div>
-              {openIndex === i && (
-                <p className="mt-3 text-sm text-gray-600">{faq.a}</p>
-              )}
+        {faqs.map((faq, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.1 }}
+            className="mb-5 bg-white/80 rounded-2xl shadow-lg p-6 cursor-pointer hover:shadow-2xl hover:bg-orange-50/50 transition-all"
+            onClick={() => setOpenIndex(openIndex === i ? null : i)}
+          >
+            <div className="flex justify-between items-center">
+              <h3 className="font-semibold text-gray-800">{faq.q}</h3>
+              <motion.span animate={{ rotate: openIndex === i ? 180 : 0 }} className="text-gray-600">
+                ▼
+              </motion.span>
             </div>
-          ))}
-        </div>
+            {openIndex === i && (
+              <p className="mt-4 text-gray-600 text-sm leading-relaxed border-t pt-3 border-gray-200">
+                {faq.a}
+              </p>
+            )}
+          </motion.div>
+        ))}
       </section>
 
-      {/* Footer CTA */}
-      <footer className="bg-gradient-to-r from-teal-500 to-teal-700 py-12 text-center text-white">
-        <h3 className="text-2xl md:text-3xl font-semibold drop-shadow">
+      {/* ⚡ FOOTER CTA */}
+      <footer className="relative overflow-hidden bg-gradient-to-r from-[#ff8228] to-orange-600 text-white text-center py-24">
+        <div className="absolute inset-0 bg-[url('/noise.svg')] opacity-10"></div>
+        <motion.h3
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-4xl font-extrabold mb-6"
+        >
           Sẵn sàng trải nghiệm dịch vụ tiện lợi?
-        </h3>
-        <button className="mt-6 px-8 py-3 bg-white text-teal-700 rounded-lg shadow hover:bg-gray-100 transition transform hover:scale-105">
-          Đặt ngay
-        </button>
+        </motion.h3>
+        <motion.div whileHover={{ scale: 1.1 }}>
+          <Link
+            to="/service"
+            className="px-10 py-3 bg-white text-orange-600 font-semibold rounded-full shadow-lg hover:bg-gray-100 transition-all"
+          >
+            Đặt ngay
+          </Link>
+        </motion.div>
       </footer>
     </div>
   );
