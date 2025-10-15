@@ -7,7 +7,7 @@ export default function About() {
       <Meta title={"Giới thiệu"} />
       {/* Banner */}
       <div className="bg-gradient-to-r from-teal-600 to-green-500 text-white py-20 flex flex-col items-center justify-center">
-        <h1 className="text-4xl md:text-5xl font-bold mb-4">Về Btaskee</h1>
+        <h1 className="text-4xl md:text-5xl font-bold mb-4">Về HomeCare</h1>
         <p className="text-lg md:text-xl max-w-2xl text-center">
           Btaskee – Dịch vụ dọn nhà và vệ sinh chuyên nghiệp, tiện lợi cho mọi gia đình và văn phòng.
         </p>

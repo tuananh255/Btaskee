@@ -1,4 +1,6 @@
 const Employee = require("../models/UserModel");
+const Order = require("../models/OrderModel");
+const WorkAssignment  = require("../models/WorkAssignmentModel");
 
 // Tạo nhân viên mới
 const createEmployee = async (req, res) => {
@@ -107,6 +109,48 @@ const getBranchOrder = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 }
+const getEmployeesByBranchWithStatus = async (req, res) => {
+  try {
+    const { branchId } = req.params;
+    const { date } = req.query; // YYYY-MM-DD
+
+    const employees = await Employee.find({ branch: branchId, role: "staff" });
+
+    const start = new Date(date);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(date);
+    end.setHours(23, 59, 59, 999);
+
+    const result = await Promise.all(
+      employees.map(async (emp) => {
+        const hasOrder = await Order.exists({
+          staff: emp._id,
+          scheduledAt: { $gte: start, $lte: end },
+          status: { $nin: ["completed", "canceled"] },
+        });
+
+        const hasAssignment = await WorkAssignment.exists({
+          staff: emp._id,
+          startTime: { $lte: end },
+          endTime: { $gte: start },
+          status: { $nin: ["completed", "canceled"] },
+        });
+
+        return {
+          _id: emp._id,
+          name: emp.name,
+          email: emp.email,
+          phone: emp.phone,
+          busy: Boolean(hasOrder || hasAssignment),
+        };
+      })
+    );
+
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
 module.exports = {
-  deleteEmployee,updateEmployee,getEmployeeById,getAllEmployees,createEmployee,getEmployeesByBranch,getBranchOrder
+  deleteEmployee,updateEmployee,getEmployeeById,getAllEmployees,createEmployee,getEmployeesByBranch,getBranchOrder,getEmployeesByBranchWithStatus
 }

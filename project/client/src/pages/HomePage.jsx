@@ -1,16 +1,30 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination, EffectFade } from "swiper/modules";
 import { motion } from "framer-motion";
-import "swiper/css";
-import "swiper/css/pagination";
-import "swiper/css/effect-fade";
 import { Link } from "react-router-dom";
 import Meta from "../components/Meta";
 import { heroImages, features, howItWorks, services, testimonials, faqs } from "../data/index";
+import axios from "axios";
 
 export default function HomePage() {
   const [openIndex, setOpenIndex] = useState(null);
+   const [services, setServices] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/api/services/getall");
+        setServices(res.data);
+      } catch (err) {
+        console.error("Lỗi khi tải dịch vụ:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchServices();
+  }, []);
 
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-orange-50 via-white to-teal-50 overflow-hidden">
@@ -148,30 +162,38 @@ export default function HomePage() {
         >
           Dịch vụ nổi bật
         </motion.h2>
-        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8">
-          {services.map((s, i) => (
-            <motion.div
-              key={i}
-              whileHover={{ scale: 1.04 }}
-              className="relative overflow-hidden rounded-3xl shadow-xl group cursor-pointer"
-            >
-              <img
-                src={s.img}
-                alt={s.title}
-                className="w-full h-80 object-cover transition-transform duration-[1500ms] group-hover:scale-110"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent flex flex-col justify-end p-8 text-white">
-                <h3 className="text-2xl font-semibold mb-3">{s.title}</h3>
-                <Link
-                  to="/service"
-                  className="inline-block bg-gradient-to-r from-orange-500 to-orange-600 px-5 py-2 rounded-full text-sm font-medium hover:shadow-lg hover:brightness-110 transition-all"
-                >
-                  Đặt ngay
-                </Link>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+
+        {loading ? (
+          <div className="text-center text-gray-500">Đang tải dịch vụ...</div>
+        ) : (
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8">
+            {services.map((s, i) => (
+              <motion.div
+                key={s._id || i}
+                whileHover={{ scale: 1.04 }}
+                className="relative overflow-hidden rounded-3xl shadow-xl group cursor-pointer"
+              >
+                <img
+                  src="https://www.btaskee.com/wp-content/uploads/2020/11/chon-dich-vu-grocery.png"
+                  alt={s.name}
+                  className="w-full h-80 object-cover transition-transform duration-[1500ms] group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent flex flex-col justify-end p-8 text-white">
+                  <h3 className="text-2xl font-semibold mb-3">{s.name}</h3>
+                  <p className="text-gray-200 mb-3">
+                    {s.description || "Dịch vụ chất lượng, uy tín hàng đầu."}
+                  </p>
+                  <Link
+                    to={`/booking/${s._id}`}
+                    className="inline-block bg-gradient-to-r from-orange-500 to-orange-600 px-5 py-2 rounded-full text-sm font-medium hover:shadow-lg hover:brightness-110 transition-all"
+                  >
+                    Đặt ngay
+                  </Link>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* 💬 TESTIMONIALS */}

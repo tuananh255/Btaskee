@@ -1,39 +1,81 @@
 const CustomerModel = require("../models/CustomerModel");
 const Order = require("../models/OrderModel");
-
+const User = require("../models/UserModel");
+const WorkAssignment = require("../models/WorkAssignmentModel");
 // Tạo đơn hàng mới
 const createOrder = async (req, res) => {
   try {
-    const { customer, service, branch, scheduledAt, notes, price,paymentMethod ,paymentStatus } = req.body;
+    const { customer, service, branch, scheduledAt, notes, price, paymentMethod, paymentStatus } = req.body;
 
-    // 🔑 customer ở đây là clerkId (string)
     const existingCustomer = await CustomerModel.findOne({ clerkId: customer });
     if (!existingCustomer) {
       return res.status(400).json({ error: "Customer not found" });
     }
 
     const order = new Order({
-      customer: existingCustomer._id, // ✅ dùng ObjectId
+      customer: existingCustomer._id,
       service,
       branch,
       scheduledAt,
       notes,
       price,
-      paymentMethod: paymentMethod || "COD", 
-      paymentStatus:paymentStatus,
-      status: "pending",
+      paymentMethod: paymentMethod || "COD",
+      paymentStatus: paymentStatus || "unpaid",
+      status: "assigning",
     });
 
+    const staffList = await User.find({ role: "staff", branch });
+    const availableStaff = [];
+    const start = new Date(scheduledAt);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(scheduledAt);
+    end.setHours(23, 59, 59, 999);
+
+    for (const staff of staffList) {
+      const busyOrders = await Order.findOne({
+        staff: staff._id,
+        scheduledAt: { $gte: start, $lte: end },
+        status: { $nin: ["completed", "canceled"] }, 
+      });
+
+      const busyAssignments = await WorkAssignment.findOne({
+        staff: staff._id,
+        startTime: { $lte: end },
+        endTime: { $gte: start },
+        status: { $nin: ["completed", "canceled"] },
+      });
+
+      if (!busyOrders && !busyAssignments) {
+        availableStaff.push(staff);
+      }
+    }
+
+    if (availableStaff.length === 0) {
+      await order.save(); 
+      return res.status(200).json({
+        message: "Không có nhân viên rảnh. Đơn được lưu ở trạng thái chờ phân công.",
+        order,
+      });
+    }
+
+    const assignedStaff = availableStaff[0];
+    order.staff = assignedStaff._id;
+    order.status = "pending";
     await order.save();
 
-    const populatedOrder = await Order.findById(order._id)
-      .populate("customer", "name phone email")
-      .populate("service", "name price")
-      .populate("branch", "name address");
+    const populated = await Order.findById(order._id)
+      .populate("customer", "name phone")
+      .populate("service", "name")
+      .populate("branch", "name")
+      .populate("staff", "name email");
 
-    res.status(201).json(populatedOrder);
+    res.status(201).json({
+      message: `Đơn đã được phân công cho nhân viên ${assignedStaff.name}`,
+      order: populated,
+    });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: err.message });
   }
 };
 

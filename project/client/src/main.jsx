@@ -6,6 +6,9 @@ import { BrowserRouter } from 'react-router-dom'
   import { ClerkProvider } from '@clerk/clerk-react'
 import { HelmetProvider } from "react-helmet-async";
 import ScrollToTop from './components/ScrollToTop.jsx'
+import "swiper/css";
+import "swiper/css/pagination";
+import "swiper/css/effect-fade";
   // Import your Publishable Key
   const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
 
